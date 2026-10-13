@@ -26,3 +26,14 @@ CREATE TABLE CATEGORIES(
     Description TEXT
 );
 
+CREATE TABLE DRUGS(
+    DrugID INT AUTO_INCREMENT PRIMARY KEY,
+    CategoryID INT NOT NULL,
+    GenericName VARCHAR(150) NOT NULL,
+    BrandName VARCHAR(150),
+    UnitMeasure FLOAT NOT NULL,
+    UnitPrice FLOAT NOT NULL,
+    FOREIGN KEY (CategoryID) REFERENCES CATEGORIES(CategoryID)
+);
+
+
