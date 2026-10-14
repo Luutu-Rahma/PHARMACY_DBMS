@@ -14,6 +14,22 @@
             "database": "pharmacy_sales_and_inventory_db",
             "username": "root",
             "password": "Rahma1234"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "Pharmacy Local",
+            "group": "Group_16",
+            "database": "pharmacy_sales_inventory_db",
+            "username": "root",
+            "password": ""
         }
     ]
 }
