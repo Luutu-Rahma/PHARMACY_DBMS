@@ -11,9 +11,9 @@
             "port": 3306,
             "driver": "MySQL",
             "name": "PharmacySalesAndInventory Local",
-            "database": "MySQL",
+            "database": "pharmacy_sales_and_inventory_db",
             "username": "root",
-            "password": "RAHMA"
+            "password": "Rahma1234"
         }
     ]
 }
