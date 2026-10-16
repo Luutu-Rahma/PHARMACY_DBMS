@@ -1,7 +1,7 @@
-USE pharmacy_sales_and_inventory_db;
+USE pharmacy_sales_inventory_db;
 
-CREATE DATABASE IF NOT EXISTS pharmacy_sales_and_inventory_db;
-Use pharmacy_sales_and_inventory_db;
+CREATE DATABASE IF NOT EXISTS pharmacy_sales_inventory_db;
+Use pharmacy_sales_inventory_db;
 
 
 CREATE TABLE IF NOT EXISTS USERS(
