@@ -1,0 +1,15 @@
+{
+    "sqltools.connections": [
+        {
+            "name": "PharmaFlow Local",
+            "driver": "MySQL",
+            "server": "localhost",
+            "port": 3306,
+            "database": "pharmacy_sales_and_inventory_db",
+            "username": "root",
+            "password": "",
+            "previewLimit": 50,
+            "mysqlOptions": { "authProtocol": "default", "enableSsl": "Disabled" }
+        }
+    ]
+}

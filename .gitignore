@@ -1,0 +1,7 @@
+# Personal VS Code DB connection (contains local passwords)
+.vscode/settings.json
+# SQLTools scratch files
+*.session.sql
+# OS / editor junk
+.DS_Store
+Thumbs.db
