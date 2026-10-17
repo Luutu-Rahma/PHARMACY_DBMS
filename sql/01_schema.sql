@@ -1,31 +1,25 @@
--- ============================================================
--- 01_schema.sql  -  PharmaFlow: Pharmacy Inventory & Sales DBMS
--- Group 16
--- Creates the database and all 7 tables (matches the ERD and
--- data dictionary).
--- ============================================================
 CREATE DATABASE IF NOT EXISTS pharmacy_sales_and_inventory_db;
 USE pharmacy_sales_and_inventory_db;
 
--- 1. USERS: staff accounts + one of the four system roles
+
 CREATE TABLE IF NOT EXISTS USERS (
     UserID    INT AUTO_INCREMENT PRIMARY KEY,
     FullName  VARCHAR(150) NOT NULL,
     UserName  VARCHAR(50)  NOT NULL UNIQUE,
-    Password  VARCHAR(255) NOT NULL,          -- store a hash, never plain text
+    Password  VARCHAR(255) NOT NULL,          
     `Role`    VARCHAR(50)  NOT NULL,
     CONSTRAINT chk_user_role CHECK
         (`Role` IN ('Admin','InventoryManager','Pharmacist','Cashier'))
 );
 
--- 2. CATEGORIES: logical drug groups
+
 CREATE TABLE IF NOT EXISTS CATEGORIES (
     CategoryID   INT AUTO_INCREMENT PRIMARY KEY,
     CategoryName VARCHAR(100) NOT NULL UNIQUE,
     Description  TEXT
 );
 
--- 3. SUPPLIERS: vendors who deliver batches
+
 CREATE TABLE IF NOT EXISTS SUPPLIERS (
     SupplierID    INT AUTO_INCREMENT PRIMARY KEY,
     SupplierName  VARCHAR(150) NOT NULL,
@@ -35,20 +29,19 @@ CREATE TABLE IF NOT EXISTS SUPPLIERS (
     Address       TEXT
 );
 
--- 4. DRUGS: master catalogue (Category 1 : M Drugs)
 CREATE TABLE IF NOT EXISTS DRUGS (
     DrugID      INT AUTO_INCREMENT PRIMARY KEY,
     CategoryID  INT NOT NULL,
     GenericName VARCHAR(150) NOT NULL,
     BrandName   VARCHAR(150),
-    UnitMeasure VARCHAR(50)  NOT NULL,        -- e.g. tablets, bottle, capsules
-    UnitPrice   DECIMAL(12,2) NOT NULL,       -- standard base selling price
+    UnitMeasure VARCHAR(50)  NOT NULL,        
+    UnitPrice   DECIMAL(12,2) NOT NULL,       
     CONSTRAINT chk_drug_price CHECK (UnitPrice >= 0),
     CONSTRAINT fk_drug_category FOREIGN KEY (CategoryID)
         REFERENCES CATEGORIES(CategoryID)
 );
 
--- 5. INVENTORY_BATCHES: physical stock (Drug 1 : M Batches, Supplier 1 : M Batches)
+
 CREATE TABLE IF NOT EXISTS INVENTORY_BATCHES (
     BatchID          INT AUTO_INCREMENT PRIMARY KEY,
     DrugID           INT NOT NULL,
@@ -58,7 +51,7 @@ CREATE TABLE IF NOT EXISTS INVENTORY_BATCHES (
     QuantityLeft     INT NOT NULL,
     MFD              DATE NOT NULL,
     ExpiryDate       DATE NOT NULL,
-    UnitPrice        DECIMAL(12,2) NOT NULL,  -- selling price for THIS batch
+    UnitPrice        DECIMAL(12,2) NOT NULL,  
     CONSTRAINT uq_drug_batch   UNIQUE (DrugID, BatchNumber),
     CONSTRAINT chk_qty_rec     CHECK (QuantityReceived > 0),
     CONSTRAINT chk_qty_left    CHECK (QuantityLeft >= 0 AND QuantityLeft <= QuantityReceived),
