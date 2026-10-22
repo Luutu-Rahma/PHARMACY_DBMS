@@ -6,7 +6,7 @@ import mysql.connector
 DB = dict(
     host="localhost",
     user="pf_admin",
-    password="Admin@123",
+    password="wrong",
     database="pharmacy_sales_and_inventory_db",
 )
 
