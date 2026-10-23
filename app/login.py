@@ -4,6 +4,7 @@ import mysql.connector
 from db import connect
 from sales_form import SalesForm
 from inventory_form import InventoryForm
+from drugs_suppliers_form import DrugsSuppliersForm
 
 # Menu items shown per role
 MENUS = {
@@ -49,6 +50,8 @@ class MenuWindow(tk.Toplevel):
             SalesForm(self, self.user)
         elif item == "Inventory":
             InventoryForm(self, self.user)
+        elif item == "Drugs & Suppliers":
+            DrugsSuppliersForm(self,self.user)
         else:
             # Placeholder: other forms get connected here later
             messagebox.showinfo(item, f"{item} form coming soon")
