@@ -7,6 +7,7 @@ from inventory_form import InventoryForm
 from drugs_suppliers_form import DrugsSuppliersForm
 from reports_form import ReportsForm
 from view_forms import ViewDrugsForm, ViewStockForm
+from users_form import UsersForm
 
 # Menu items shown per role
 MENUS = {
@@ -60,6 +61,8 @@ class MenuWindow(tk.Toplevel):
             ViewDrugsForm(self, self.user)
         elif item == "View Stock":
             ViewStockForm(self, self.user)
+        elif item == "Users":
+            UsersForm(self, self.user)
         else:
             # Placeholder: other forms get connected here later
             messagebox.showinfo(item, f"{item} form coming soon")
