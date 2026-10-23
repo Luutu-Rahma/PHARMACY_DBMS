@@ -1,14 +1,13 @@
 import tkinter as tk
 from tkinter import messagebox
 import mysql.connector
-
-# Connection settings (change in one place)
-DB = dict(
-    host="localhost",
-    user="pf_admin",
-    password="Admin@123",
-    database="pharmacy_sales_and_inventory_db",
-)
+from db import connect
+from sales_form import SalesForm
+from inventory_form import InventoryForm
+from drugs_suppliers_form import DrugsSuppliersForm
+from reports_form import ReportsForm
+from view_forms import ViewDrugsForm, ViewStockForm
+from users_form import UsersForm
 
 # Menu items shown per role
 MENUS = {
@@ -21,15 +20,13 @@ MENUS = {
 
 def check_login(username, password):
     """Return (UserID, FullName, Role) if valid, else None."""
-    con = mysql.connector.connect(**DB)
+    con = connect()
     try:
         cur = con.cursor()
-        # Accepts a SHA2 hash or plain text. Remove the plain-text
-        # check once the passwords in 03_seed.sql are hashed.
         cur.execute(
             "SELECT UserID, FullName, Role FROM users "
             "WHERE UserName=%s AND Password=SHA2(%s,256)",
-            (username, password, ),
+            (username, password),
         )
         return cur.fetchone()
     finally:
@@ -52,8 +49,23 @@ class MenuWindow(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.logout)
 
     def open_item(self, item):
-        # Placeholder: each form gets connected here later
-        messagebox.showinfo(item, f"{item} form coming soon")
+        if item == "Sales":
+            SalesForm(self, self.user)
+        elif item == "Inventory":
+            InventoryForm(self, self.user)
+        elif item == "Drugs & Suppliers":
+            DrugsSuppliersForm(self,self.user)
+        elif item =="Reports":
+            ReportsForm(self,self.user)
+        elif item == "View Drugs":
+            ViewDrugsForm(self, self.user)
+        elif item == "View Stock":
+            ViewStockForm(self, self.user)
+        elif item == "Users":
+            UsersForm(self, self.user)
+        else:
+            # Placeholder: other forms get connected here later
+            messagebox.showinfo(item, f"{item} form coming soon")
 
     def logout(self):
         self.destroy()
