@@ -3,6 +3,7 @@ from tkinter import messagebox
 import mysql.connector
 from db import connect
 from sales_form import SalesForm
+from inventory_form import InventoryForm
 
 # Menu items shown per role
 MENUS = {
@@ -46,6 +47,8 @@ class MenuWindow(tk.Toplevel):
     def open_item(self, item):
         if item == "Sales":
             SalesForm(self, self.user)
+        elif item == "Inventory":
+            InventoryForm(self, self.user)
         else:
             # Placeholder: other forms get connected here later
             messagebox.showinfo(item, f"{item} form coming soon")
