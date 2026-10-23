@@ -7,10 +7,10 @@ USE pharmacy_sales_and_inventory_db;
 
 
 INSERT INTO USERS (FullName, UserName, Password, `Role`) VALUES
-('Luutu Rahma Namayanja', 'rahma',   SHA2('Lrahma@2026',256), 'Admin'),
-('Ojambo Nicholas',       'nicholas',SHA2('Onicho@2026',256), 'InventoryManager'),
-('Mumbere Breiline',      'breiline',SHA2('Mbreiline@2026',256), 'Pharmacist'),
-('Nambuya Raudha',        'raudha',  SHA2('Nraudha@2026',256), 'Cashier');
+('Luutu Rahma Namayanja', 'rahma',   SHA2('Lrahma@123',256), 'Admin'),
+('Ojambo Nicholas',       'nicholas',SHA2('Onicho@123',256), 'InventoryManager'),
+('Mumbere Breiline',      'breiline',SHA2('Mbreiline@123',256), 'Pharmacist'),
+('Nambuya Raudha',        'raudha',  SHA2('Nraudha@123',256), 'Cashier');
 
 INSERT INTO CATEGORIES (CategoryName, Description) VALUES
 ('Painkillers', 'General pain relief medication'),
