@@ -2,16 +2,13 @@ import os
 import tkinter as tk
 from tkinter import messagebox
 import mysql.connector
-
-# Connection settings (change in one place).
-# The database password is NOT stored in the code. Set it in your terminal
-# before running (PowerShell):   $env:PF_DB_PASSWORD = "Admin@123"
-DB = dict(
-    host=os.environ.get("PF_DB_HOST", "localhost"),
-    user=os.environ.get("PF_DB_USER", "pf_admin"),
-    password=os.environ.get("PF_DB_PASSWORD", ""),
-    database="pharmacy_sales_and_inventory_db",
-)
+from db import connect
+from sales_form import SalesForm
+from inventory_form import InventoryForm
+from drugs_suppliers_form import DrugsSuppliersForm
+from reports_form import ReportsForm
+from view_forms import ViewDrugsForm, ViewStockForm
+from users_form import UsersForm
 
 # Menu items shown per role
 MENUS = {
@@ -24,12 +21,9 @@ MENUS = {
 
 def check_login(username, password):
     """Return (UserID, FullName, Role) if valid, else None."""
-    con = mysql.connector.connect(**DB)
+    con = connect()
     try:
         cur = con.cursor()
-        # The typed password is hashed with SHA-256 and compared with the
-        # hash stored in USERS (03_seed.sql stores SHA2 hashes).
-        # %s placeholders keep user input separate from the SQL (no injection).
         cur.execute(
             "SELECT UserID, FullName, `Role` FROM USERS "
             "WHERE UserName=%s AND Password=SHA2(%s,256)",
@@ -56,8 +50,23 @@ class MenuWindow(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.logout)
 
     def open_item(self, item):
-        # Placeholder: each form gets connected here later
-        messagebox.showinfo(item, f"{item} form coming soon")
+        if item == "Sales":
+            SalesForm(self, self.user)
+        elif item == "Inventory":
+            InventoryForm(self, self.user)
+        elif item == "Drugs & Suppliers":
+            DrugsSuppliersForm(self,self.user)
+        elif item =="Reports":
+            ReportsForm(self,self.user)
+        elif item == "View Drugs":
+            ViewDrugsForm(self, self.user)
+        elif item == "View Stock":
+            ViewStockForm(self, self.user)
+        elif item == "Users":
+            UsersForm(self, self.user)
+        else:
+            # Placeholder: other forms get connected here later
+            messagebox.showinfo(item, f"{item} form coming soon")
 
     def logout(self):
         self.destroy()
