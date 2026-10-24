@@ -1,12 +1,15 @@
+import os
 import tkinter as tk
 from tkinter import messagebox
 import mysql.connector
 
-# Connection settings (change in one place)
+# Connection settings (change in one place).
+# The database password is NOT stored in the code. Set it in your terminal
+# before running (PowerShell):   $env:PF_DB_PASSWORD = "Admin@123"
 DB = dict(
-    host="localhost",
-    user="pf_admin",
-    password="Admin@123",
+    host=os.environ.get("PF_DB_HOST", "localhost"),
+    user=os.environ.get("PF_DB_USER", "pf_admin"),
+    password=os.environ.get("PF_DB_PASSWORD", ""),
     database="pharmacy_sales_and_inventory_db",
 )
 
@@ -24,12 +27,13 @@ def check_login(username, password):
     con = mysql.connector.connect(**DB)
     try:
         cur = con.cursor()
-        # Accepts a SHA2 hash or plain text. Remove the plain-text
-        # check once the passwords in 03_seed.sql are hashed.
+        # The typed password is hashed with SHA-256 and compared with the
+        # hash stored in USERS (03_seed.sql stores SHA2 hashes).
+        # %s placeholders keep user input separate from the SQL (no injection).
         cur.execute(
-            "SELECT UserID, FullName, Role FROM users "
+            "SELECT UserID, FullName, `Role` FROM USERS "
             "WHERE UserName=%s AND Password=SHA2(%s,256)",
-            (username, password, ),
+            (username, password),
         )
         return cur.fetchone()
     finally:
