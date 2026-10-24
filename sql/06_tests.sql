@@ -1,16 +1,22 @@
 -- ============================================================
 -- 06_tests.sql  -  each statement below SHOULD FAIL (that is the point)
 -- Run them one at a time and screenshot the errors for your report.
+-- (T1/T2 are wrapped in START TRANSACTION ... ROLLBACK so a failed sale
+--  does not leave an empty receipt behind in TRANSACTIONS.)
 -- ============================================================
 USE pharmacy_sales_and_inventory_db;
 
 -- T1: sell from the EXPIRED batch (BatchID 1)            -> 'batch is expired'
+START TRANSACTION;
 INSERT INTO TRANSACTIONS (UserID, PaymentMethod) VALUES (4,'Cash');
 INSERT INTO SALES_ITEMS (TransactionID, BatchID, QuantitySold) VALUES (LAST_INSERT_ID(), 1, 1);
+ROLLBACK;   -- removes the empty receipt created by the first INSERT
 
 -- T2: sell more than is in stock                          -> 'insufficient stock'
+START TRANSACTION;
 INSERT INTO TRANSACTIONS (UserID, PaymentMethod) VALUES (4,'Cash');
 INSERT INTO SALES_ITEMS (TransactionID, BatchID, QuantitySold) VALUES (LAST_INSERT_ID(), 4, 99999);
+ROLLBACK;   -- removes the empty receipt created by the first INSERT
 
 -- T3: invalid role                                        -> CHECK constraint fails
 INSERT INTO USERS (FullName, UserName, Password, `Role`) VALUES ('Test','t1','x','Janitor');

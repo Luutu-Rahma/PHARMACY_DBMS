@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import mysql.connector
-from db import connect
+from db import connect, set_role
 from sales_form import SalesForm
 from inventory_form import InventoryForm
 from drugs_suppliers_form import DrugsSuppliersForm
@@ -24,7 +24,7 @@ def check_login(username, password):
     try:
         cur = con.cursor()
         cur.execute(
-            "SELECT UserID, FullName, Role FROM users "
+            "SELECT UserID, FullName, Role FROM USERS "
             "WHERE UserName=%s AND Password=SHA2(%s,256)",
             (username, password),
         )
@@ -68,6 +68,7 @@ class MenuWindow(tk.Toplevel):
             messagebox.showinfo(item, f"{item} form coming soon")
 
     def logout(self):
+        set_role("login")          # back to the read-users-only account
         self.destroy()
         self.master.deiconify()
 
@@ -105,6 +106,7 @@ class LoginWindow(tk.Tk):
             self.pass_entry.delete(0, tk.END)
             return
         self.pass_entry.delete(0, tk.END)
+        set_role(user[2])          # from now on connect as this role's MySQL account
         self.withdraw()
         MenuWindow(self, user)
 

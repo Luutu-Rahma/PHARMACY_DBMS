@@ -160,11 +160,16 @@ class ChartTab(ttk.Frame):
 
         self.tree = None
         if table_cols:
-            self.tree = ttk.Treeview(self, columns=table_cols, show="headings", height=5)
+            holder = tk.Frame(self)
+            holder.pack(side="bottom", fill="x", padx=12, pady=(4, 0))
+            self.tree = ttk.Treeview(holder, columns=table_cols, show="headings", height=5)
             for c in table_cols:
                 self.tree.heading(c, text=c)
                 self.tree.column(c, width=130, anchor="w")
-            self.tree.pack(side="bottom", fill="x", padx=12, pady=(4, 0))
+            scroll = ttk.Scrollbar(holder, orient="vertical", command=self.tree.yview)
+            self.tree.configure(yscrollcommand=scroll.set)
+            scroll.pack(side="right", fill="y")
+            self.tree.pack(side="left", fill="x", expand=True)
 
         self.fig = Figure(figsize=(8.8, 4.2), dpi=100)
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
@@ -206,6 +211,8 @@ class ReportsForm(tk.Toplevel):
         self.geometry("1000x740")
         tk.Label(self, text="Reports & Insights", font=("Arial", 16, "bold")).pack(pady=(12, 4))
 
+        # Pack Close first (bottom) so it is never squeezed off-screen by the tabs
+        tk.Button(self, text="Close", width=10, command=self.destroy).pack(side="bottom", pady=(0, 10))
         tabs = ttk.Notebook(self)
         tabs.pack(fill="both", expand=True, padx=10, pady=(0, 8))
         tabs.add(ChartTab(tabs, sales_over_time), text="Sales over time")
@@ -215,4 +222,3 @@ class ReportsForm(tk.Toplevel):
         tabs.add(ChartTab(tabs, expiry_watch,
                           table_cols=("Drug", "Batch", "Left", "Expiry", "Days left", "Value (UGX)")),
                  text="Expiry watch")
-        tk.Button(self, text="Close", width=10, command=self.destroy).pack(pady=(0, 10))

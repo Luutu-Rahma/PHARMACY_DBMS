@@ -14,6 +14,7 @@ echo Rebuilding database...
 "%MYSQL%" -u root < "%SQLDIR%\01_schema.sql"                || goto :err
 "%MYSQL%" -u root < "%SQLDIR%\02_triggers_procedures.sql"   || goto :err
 "%MYSQL%" -u root < "%SQLDIR%\03_seed.sql"                  || goto :err
+"%MYSQL%" -u root < "%SQLDIR%\03b_seed_extra.sql"            || goto :err
 "%MYSQL%" -u root < "%SQLDIR%\05_roles_privileges.sql"      || goto :err
 echo.
 echo DONE. Database pharmacy_sales_and_inventory_db is ready.

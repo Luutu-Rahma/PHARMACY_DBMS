@@ -66,14 +66,19 @@ class InventoryForm(tk.Toplevel):
         tk.Label(self, text="All batches (red = expired, orange = expiring soon)",
                  font=("Arial", 11, "bold")).pack(anchor="w", padx=15)
         cols = ("ID", "Drug", "Batch", "Supplier", "Received", "Left", "MFD", "Expiry", "Price", "Status")
-        self.tree = ttk.Treeview(self, columns=cols, show="headings", height=14)
-        widths = (40, 150, 100, 150, 70, 60, 90, 90, 70, 100)
+        holder = tk.Frame(self)
+        holder.pack(fill="both", expand=True, padx=15, pady=8)
+        self.tree = ttk.Treeview(holder, columns=cols, show="headings", height=14)
+        widths = (40, 140, 100, 140, 65, 50, 90, 90, 65, 115)
         for c, w in zip(cols, widths):
             self.tree.heading(c, text=c)
             self.tree.column(c, width=w, anchor="w")
         self.tree.tag_configure("expired", background="#f8d7da")
         self.tree.tag_configure("soon", background="#ffe5b4")
-        self.tree.pack(fill="both", expand=True, padx=15, pady=8)
+        scroll = ttk.Scrollbar(holder, orient="vertical", command=self.tree.yview)
+        self.tree.configure(yscrollcommand=scroll.set)
+        scroll.pack(side="right", fill="y")
+        self.tree.pack(side="left", fill="both", expand=True)
 
     # ---------- data ----------
     def load_lists(self):
@@ -124,7 +129,8 @@ class InventoryForm(tk.Toplevel):
     # ---------- form ----------
     def fill_price(self, event=None):
         label = self.drug_box.get()
-        if label in self.drugs and not self.price_entry.get().strip():
+        if label in self.drugs:
+            self.price_entry.delete(0, tk.END)
             self.price_entry.insert(0, f"{self.drugs[label][1]:.2f}")
 
     def clear_form(self):
