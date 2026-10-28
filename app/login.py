@@ -24,7 +24,7 @@ def check_login(username, password):
     try:
         cur = con.cursor()
         cur.execute(
-            "SELECT UserID, FullName, Role FROM users "
+            "SELECT UserID, FullName, Role FROM USERS "
             "WHERE UserName=%s AND Password=SHA2(%s,256)",
             (username, password),
         )
