@@ -35,6 +35,9 @@ setup.bat                     one-click rebuild for XAMPP on Windows
    (this file is git-ignored), then connect with SQLTools.
 4. Open `sql/04_queries_reports.sql` and run the queries.
 
+## Desktop application
+The project also includes a Tkinter desktop app for sales, inventory, drug and supplier records, user management, and reports. For first-time setup—including Python packages, database preparation, optional VS Code extensions, and how to launch the app—see [docs/TKINTER_APP_GUIDE.md](docs/TKINTER_APP_GUIDE.md).
+
 ## Key rules enforced by the database
 - Only 4 valid roles; only `Cash` or `Mobile Money` payments.
 - Expiry date must be after manufacture date; stock can never go negative.
