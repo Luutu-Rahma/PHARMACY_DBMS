@@ -1,0 +1,8 @@
+# MySQL driver used by the app/ GUI
+mysql-connector-python
+
+# Charts embedded in the reports GUI
+matplotlib
+
+# Driver used by the root-level db.py and test_connection.py
+PyMySQL
