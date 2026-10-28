@@ -1,15 +1,32 @@
 {
-    "sqltools.connections": [
-        {
-            "name": "PharmaFlow Local",
-            "driver": "MySQL",
-            "server": "localhost",
-            "port": 3306,
-            "database": "pharmacy_sales_and_inventory_db",
-            "username": "root",
-            "password": "",
-            "previewLimit": 50,
-            "mysqlOptions": { "authProtocol": "default", "enableSsl": "Disabled" }
-        }
-    ]
+  "sqltools.connections": [
+    {
+      "name": "PharmaFlow Local",
+      "driver": "MySQL",
+      "server": "localhost",
+      "port": 3306,
+      "database": "pharmacy_sales_and_inventory_db",
+      "username": "root",
+      "password": "",
+      "previewLimit": 50,
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      }
+    },
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 3306,
+      "driver": "MySQL",
+      "name": "Pharmacy Local DB",
+      "database": "pharmacy_sales_and_inventory_db",
+      "username": "root"
+    }
+  ]
 }
