@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Sale complete{% endblock %}
+{% block content %}
+<div class="receipt-wrap"><div class="receipt-check">✓</div><p class="eyebrow">PAYMENT RECORDED</p><h1>Sale complete</h1><p class="muted">The stock has been updated and the sale is saved.</p><div class="receipt-card"><div><span>Receipt number</span><strong>#{{ receipt.id }}</strong></div><div><span>Payment method</span><strong>{{ receipt.method }}</strong></div><div class="receipt-total"><span>Total paid</span><strong>UGX {{ '{:,.0f}'.format(receipt.total) }}</strong></div></div><a class="button primary" href="/sales">Start another sale</a></div>
+{% endblock %}

@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import mysql.connector
+import psycopg
 from db import connect
 
 PAYMENT_METHODS = ["Cash", "Mobile Money"]
@@ -67,12 +67,12 @@ class SalesForm(tk.Toplevel):
                 "SELECT b.BatchID, d.GenericName, b.BatchNumber, b.QuantityLeft, "
                 "b.ExpiryDate, b.UnitPrice "
                 "FROM INVENTORY_BATCHES b JOIN DRUGS d ON d.DrugID = b.DrugID "
-                "WHERE b.ExpiryDate > CURDATE() AND b.QuantityLeft > 0 "
+                "WHERE b.ExpiryDate > CURRENT_DATE AND b.QuantityLeft > 0 "
                 "ORDER BY d.GenericName, b.ExpiryDate"
             )
             rows = cur.fetchall()
             con.close()
-        except mysql.connector.Error as e:
+        except psycopg.Error as e:
             messagebox.showerror("Database error", str(e), parent=self)
             return
         self.batches = {}
@@ -145,9 +145,9 @@ class SalesForm(tk.Toplevel):
         try:
             con = connect()
             cur = con.cursor()
-            cur.execute("INSERT INTO TRANSACTIONS (UserID, PaymentMethod) VALUES (%s, %s)",
+            cur.execute("INSERT INTO TRANSACTIONS (UserID, PaymentMethod) VALUES (%s, %s) RETURNING TransactionID",
                         (self.user_id, method))
-            tid = cur.lastrowid
+            tid = cur.fetchone()[0]
             # The triggers check expiry/stock, set SubTotal, deduct stock, update the total
             for bid, name, bno, qty, price in self.basket:
                 cur.execute(
@@ -156,10 +156,10 @@ class SalesForm(tk.Toplevel):
             cur.execute("SELECT TotalAmount FROM TRANSACTIONS WHERE TransactionID = %s", (tid,))
             total = cur.fetchone()[0]
             con.commit()
-        except mysql.connector.Error as e:
+        except psycopg.Error as e:
             if con:
                 con.rollback()
-            messagebox.showerror("Sale failed", e.msg, parent=self)
+            messagebox.showerror("Sale failed", str(e), parent=self)
             return
         finally:
             if con:

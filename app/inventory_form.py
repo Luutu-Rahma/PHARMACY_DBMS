@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import datetime, date
-import mysql.connector
+import psycopg
 from db import connect
 
 SOON_DAYS = 90  # batches expiring within this many days are flagged
@@ -85,7 +85,7 @@ class InventoryForm(tk.Toplevel):
             cur.execute("SELECT SupplierID, SupplierName FROM SUPPLIERS ORDER BY SupplierName")
             self.suppliers = {n: i for i, n in cur.fetchall()}
             con.close()
-        except mysql.connector.Error as e:
+        except psycopg.Error as e:
             messagebox.showerror("Database error", str(e), parent=self)
             return
         self.drug_box["values"] = list(self.drugs.keys())
@@ -105,7 +105,7 @@ class InventoryForm(tk.Toplevel):
             )
             rows = cur.fetchall()
             con.close()
-        except mysql.connector.Error as e:
+        except psycopg.Error as e:
             messagebox.showerror("Database error", str(e), parent=self)
             return
         self.tree.delete(*self.tree.get_children())
@@ -182,10 +182,10 @@ class InventoryForm(tk.Toplevel):
                 (self.drugs[drug][0], self.suppliers[supplier], batch_no, qty, qty, mfd, exp, price),
             )
             con.commit()
-        except mysql.connector.Error as e:
+        except psycopg.Error as e:
             if con:
                 con.rollback()
-            messagebox.showerror("Could not save", e.msg, parent=self)
+            messagebox.showerror("Could not save", str(e), parent=self)
             return
         finally:
             if con:

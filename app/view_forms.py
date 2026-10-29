@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import date
-import mysql.connector
+import psycopg
 from db import connect
 
 LOW_STOCK = 50   # drugs with fewer sellable units than this are flagged
@@ -76,7 +76,7 @@ class ListWindow(tk.Toplevel):
             cur.execute(self.fetch())
             self.all_rows = cur.fetchall()
             con.close()
-        except mysql.connector.Error as e:
+        except psycopg.Error as e:
             messagebox.showerror("Database error", str(e), parent=self)
             return
         self.apply_filter()
@@ -104,7 +104,7 @@ class ViewDrugsForm(ListWindow):
 
     def fetch(self):
         return ("SELECT d.GenericName, d.BrandName, c.CategoryName, d.UnitMeasure, d.UnitPrice, "
-                "COALESCE(SUM(CASE WHEN b.ExpiryDate > CURDATE() THEN b.QuantityLeft ELSE 0 END), 0) "
+                "COALESCE(SUM(CASE WHEN b.ExpiryDate > CURRENT_DATE THEN b.QuantityLeft ELSE 0 END), 0) "
                 "FROM DRUGS d JOIN CATEGORIES c ON c.CategoryID = d.CategoryID "
                 "LEFT JOIN INVENTORY_BATCHES b ON b.DrugID = d.DrugID "
                 "GROUP BY d.DrugID, d.GenericName, d.BrandName, c.CategoryName, d.UnitMeasure, d.UnitPrice "

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}{{ config.title }}{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">CATALOGUE MANAGEMENT</p><h1>{{ config.title }}</h1><p class="muted">Add a record or select an existing row to update it.</p></div></div>
+<div class="two-column records-layout">
+<section class="panel"><div class="section-heading"><div><h2>{% if record %}Update record{% else %}Add {{ config.title[:-1] if config.title.endswith('s') else config.title }}{% endif %}</h2><p class="muted">Fields marked with * are required.</p></div></div>
+<form method="post" action="/records/{{ entity }}/save" class="form-stack"><input type="hidden" name="csrf_token" value="{{ csrf }}"><input type="hidden" name="record_id" value="{{ record[config.pk] if record else '' }}">
+{% for column, label, kind, required in config.fields %}<label for="{{ column }}">{{ label }}{% if required %} *{% endif %}</label>
+{% if kind == 'category' %}<select id="{{ column }}" name="{{ column }}" required><option value="">Choose category…</option>{% for category in categories %}<option value="{{ category.categoryid }}" {% if record and record.categoryid == category.categoryid %}selected{% endif %}>{{ category.categoryname }}</option>{% endfor %}</select>
+{% elif kind == 'unit' %}<select id="{{ column }}" name="{{ column }}" required>{% for unit in ['tablets','capsules','syrup','injection','cream'] %}<option {% if record and record.unitmeasure == unit %}selected{% endif %}>{{ unit }}</option>{% endfor %}</select>
+{% elif kind == 'textarea' %}<textarea id="{{ column }}" name="{{ column }}" rows="3">{{ record[column] if record and record[column] else '' }}</textarea>
+{% else %}<input id="{{ column }}" name="{{ column }}" type="{{ kind if kind in ['email','number'] else 'text' }}" {% if kind == 'number' %}min="0.01" step="0.01"{% endif %} value="{{ record[column] if record and record[column] is not none else '' }}" {% if required %}required{% endif %}>{% endif %}{% endfor %}
+<div class="button-row"><button class="button primary" type="submit">{{ 'Save changes' if record else 'Add record' }}</button>{% if record %}<a class="button secondary" href="/records/{{ entity }}">Cancel edit</a>{% else %}<button class="button secondary" type="reset">Clear form</button>{% endif %}</div></form>
+</section>
+<section class="panel list-panel"><div class="section-heading"><div><h2>Current {{ config.title|lower }}</h2><p class="muted">{{ rows|length }} record(s)</p></div><a class="button secondary" href="/records/{{ entity }}">Refresh</a></div>
+<div class="table-wrap"><table><thead><tr>{% if entity == 'drugs' %}<th>Generic name</th><th>Brand</th><th>Category</th><th>Unit</th><th>Price (UGX)</th>{% elif entity == 'suppliers' %}<th>Supplier</th><th>Contact</th><th>Phone</th><th>Email</th><th>Address</th>{% else %}<th>Category</th><th>Description</th>{% endif %}<th></th></tr></thead><tbody>
+{% for row in rows %}<tr>{% if entity == 'drugs' %}<td>{{ row.genericname }}</td><td>{{ row.brandname or '—' }}</td><td>{{ row.categoryname }}</td><td>{{ row.unitmeasure }}</td><td>{{ '{:,.0f}'.format(row.unitprice) }}</td>{% elif entity == 'suppliers' %}<td>{{ row.suppliername }}</td><td>{{ row.contactperson or '—' }}</td><td>{{ row.phonenumber or '—' }}</td><td>{{ row.email or '—' }}</td><td>{{ row.address or '—' }}</td>{% else %}<td>{{ row.categoryname }}</td><td>{{ row.description or '—' }}</td>{% endif %}<td><a class="table-action" href="/records/{{ entity }}?edit_id={{ row[config.pk] }}">Edit</a></td></tr>{% else %}<tr><td class="empty-table" colspan="8">No records yet.</td></tr>{% endfor %}
+</tbody></table></div></section>
+</div>
+{% endblock %}

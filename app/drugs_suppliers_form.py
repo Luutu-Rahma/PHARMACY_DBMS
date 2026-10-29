@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import mysql.connector
+import psycopg
 from db import connect
 
 
@@ -67,7 +67,7 @@ class CrudTab(ttk.Frame):
                     self.lookups[col] = {name: i for i, name in cur.fetchall()}
                     self.widgets[col]["values"] = list(self.lookups[col].keys())
             con.close()
-        except mysql.connector.Error as e:
+        except psycopg.Error as e:
             messagebox.showerror("Database error", str(e), parent=self)
 
     def load_rows(self):
@@ -77,7 +77,7 @@ class CrudTab(ttk.Frame):
             cur.execute(self.list_sql)
             rows = cur.fetchall()
             con.close()
-        except mysql.connector.Error as e:
+        except psycopg.Error as e:
             messagebox.showerror("Database error", str(e), parent=self)
             return
         self.tree.delete(*self.tree.get_children())
@@ -108,7 +108,7 @@ class CrudTab(ttk.Frame):
             cur.execute(f"SELECT {cols} FROM {self.table} WHERE {self.id_col} = %s", (row_id,))
             row = cur.fetchone()
             con.close()
-        except mysql.connector.Error as e:
+        except psycopg.Error as e:
             messagebox.showerror("Database error", str(e), parent=self)
             return
         if row is None:
@@ -170,10 +170,10 @@ class CrudTab(ttk.Frame):
                             values + [self.selected_id])
                 done = "updated"
             con.commit()
-        except mysql.connector.Error as e:
+        except psycopg.Error as e:
             if con:
                 con.rollback()
-            messagebox.showerror("Could not save", e.msg, parent=self)
+            messagebox.showerror("Could not save", str(e), parent=self)
             return
         finally:
             if con:

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Inventory{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">STOCK CONTROL</p><h1>Inventory</h1><p class="muted">Receive stock by batch and keep an eye on expiry dates.</p></div></div>
+{% if request.query_params.get('notice') %}<div class="flash success">{{ request.query_params.get('notice') }}</div>{% endif %}{% if request.query_params.get('error') %}<div class="flash error">{{ request.query_params.get('error') }}</div>{% endif %}
+<div class="panel"><div class="section-heading"><div><h2>Receive a batch</h2><p class="muted">A new batch starts with all received units in stock.</p></div></div>
+<form method="post" action="/inventory/batches" class="form-grid inventory-form"><input type="hidden" name="csrf_token" value="{{ csrf }}">
+<label for="drugid">Drug</label><select id="drugid" name="drugid" required><option value="">Choose drug…</option>{% for d in drugs %}<option value="{{ d.drugid }}">{{ d.genericname }}{% if d.brandname %} · {{ d.brandname }}{% endif %}</option>{% endfor %}</select>
+<label for="supplierid">Supplier</label><select id="supplierid" name="supplierid" required><option value="">Choose supplier…</option>{% for s in suppliers %}<option value="{{ s.supplierid }}">{{ s.suppliername }}</option>{% endfor %}</select>
+<label for="batchnumber">Batch number</label><input id="batchnumber" name="batchnumber" maxlength="50" required>
+<label for="quantityreceived">Quantity received</label><input id="quantityreceived" name="quantityreceived" type="number" min="1" required>
+<label for="mfd">Manufacture date</label><input id="mfd" name="mfd" type="date" required>
+<label for="expirydate">Expiry date</label><input id="expirydate" name="expirydate" type="date" required>
+<label for="unitprice">Unit price (UGX)</label><input id="unitprice" name="unitprice" type="number" min="0.01" step="0.01" required>
+<div class="wide"><button class="button primary" type="submit">Save batch</button></div></form></div>
+<div class="section-heading table-title"><div><h2>All batches</h2><p class="muted">Red means expired; orange means expiry within 90 days.</p></div><a class="button secondary" href="/inventory">Refresh list</a></div>
+<div class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>Drug</th><th>Batch</th><th>Supplier</th><th>Received</th><th>Left</th><th>Manufactured</th><th>Expiry</th><th>Unit price</th><th>Status</th></tr></thead><tbody>
+{% for b in batches %}<tr><td>{{ b.genericname }}</td><td>{{ b.batchnumber }}</td><td>{{ b.suppliername }}</td><td>{{ b.quantityreceived }}</td><td>{{ b.quantityleft }}</td><td>{{ b.mfd }}</td><td>{{ b.expirydate }}</td><td>UGX {{ '{:,.0f}'.format(b.unitprice) }}</td><td>{% if b.expirydate <= current_date %}<span class="status danger">Expired</span>{% elif (b.expirydate - current_date).days <= 90 %}<span class="status warning">Expires in {{ (b.expirydate - current_date).days }} days</span>{% else %}<span class="status good">OK</span>{% endif %}</td></tr>{% else %}<tr><td colspan="9" class="empty-table">No batches recorded yet.</td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

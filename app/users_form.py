@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import mysql.connector
+import psycopg
 from db import connect
+from passwords import hash_password
 
 ROLES = ["Admin", "InventoryManager", "Pharmacist", "Cashier"]
 MIN_PASSWORD = 6
@@ -66,10 +67,10 @@ class UsersForm(tk.Toplevel):
         try:
             con = connect()
             cur = con.cursor()
-            cur.execute("SELECT UserID, FullName, UserName, `Role` FROM USERS ORDER BY FullName")
+            cur.execute("SELECT UserID, FullName, UserName, role FROM USERS ORDER BY FullName")
             rows = cur.fetchall()
             con.close()
-        except mysql.connector.Error as e:
+        except psycopg.Error as e:
             messagebox.showerror("Database error", str(e), parent=self)
             return
         self.tree.delete(*self.tree.get_children())
@@ -133,24 +134,24 @@ class UsersForm(tk.Toplevel):
             cur = con.cursor()
             if adding:
                 cur.execute(
-                    "INSERT INTO USERS (FullName, UserName, Password, `Role`) VALUES (%s, %s, SHA2(%s, 256), %s)",
-                    (name, username, password, role))
+                    "INSERT INTO USERS (FullName, UserName, Password, role) VALUES (%s, %s, %s, %s)",
+                    (name, username, hash_password(password), role))
                 done = "added"
             elif password:
                 cur.execute(
-                    "UPDATE USERS SET FullName=%s, UserName=%s, `Role`=%s, Password=SHA2(%s, 256) WHERE UserID=%s",
-                    (name, username, role, password, self.selected_id))
+                    "UPDATE USERS SET FullName=%s, UserName=%s, role=%s, Password=%s WHERE UserID=%s",
+                    (name, username, role, hash_password(password), self.selected_id))
                 done = "updated (password changed)"
             else:
                 cur.execute(
-                    "UPDATE USERS SET FullName=%s, UserName=%s, `Role`=%s WHERE UserID=%s",
+                    "UPDATE USERS SET FullName=%s, UserName=%s, role=%s WHERE UserID=%s",
                     (name, username, role, self.selected_id))
                 done = "updated"
             con.commit()
-        except mysql.connector.Error as e:
+        except psycopg.Error as e:
             if con:
                 con.rollback()
-            messagebox.showerror("Could not save", e.msg, parent=self)
+            messagebox.showerror("Could not save", str(e), parent=self)
             return
         finally:
             if con:

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Sign in{% endblock %}
+{% block auth_content %}
+<div class="login-card">
+  <a class="brand login-brand" href="/login">✚ <span>PharmaFlow</span></a>
+  <p class="eyebrow">PHARMACY MANAGEMENT</p>
+  <h1>Welcome back</h1>
+  <p class="muted">Sign in to continue to your workspace.</p>
+  {% if request.query_params.get('notice') %}<div class="flash success">{{ request.query_params.get('notice') }}</div>{% endif %}
+  {% if error %}<div class="flash error" role="alert">{{ error }}</div>{% endif %}
+  <form method="post" action="/login" class="form-stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf }}">
+    <input type="hidden" name="next" value="{{ next_url or '/' }}">
+    <label for="username">Username</label><input id="username" name="username" required autocomplete="username" autofocus>
+    <label for="password">Password</label><input id="password" name="password" type="password" required autocomplete="current-password">
+    <button class="button primary full" type="submit">Sign in <span aria-hidden="true">→</span></button>
+  </form>
+  <p class="login-note">Local pharmacy workspace · Your access depends on your assigned role.</p>
+</div>
+{% endblock %}

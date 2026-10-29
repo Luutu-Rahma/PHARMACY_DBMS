@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
-import mysql.connector
+import psycopg
 from db import connect
+from passwords import hash_password, verify_password
 from sales_form import SalesForm
 from inventory_form import InventoryForm
 from drugs_suppliers_form import DrugsSuppliersForm
@@ -24,11 +25,19 @@ def check_login(username, password):
     try:
         cur = con.cursor()
         cur.execute(
-            "SELECT UserID, FullName, Role FROM USERS "
-            "WHERE UserName=%s AND Password=SHA2(%s,256)",
-            (username, password),
+            "SELECT UserID, FullName, Role, Password FROM users WHERE UserName=%s",
+            (username,),
         )
-        return cur.fetchone()
+        row = cur.fetchone()
+        if row is None:
+            return None
+        valid, legacy = verify_password(password, row[3])
+        if not valid:
+            return None
+        if legacy:
+            cur.execute("UPDATE users SET Password=%s WHERE UserID=%s", (hash_password(password), row[0]))
+            con.commit()
+        return row[0], row[1], row[2]
     finally:
         con.close()
 
@@ -97,7 +106,7 @@ class LoginWindow(tk.Tk):
             return
         try:
             user = check_login(username, password)
-        except mysql.connector.Error as e:
+        except psycopg.Error as e:
             messagebox.showerror("Database error", str(e))
             return
         if user is None:

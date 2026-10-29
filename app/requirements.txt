@@ -1,15 +1,2 @@
-contourpy==1.4.0
-cycler==0.12.1
-fonttools==4.68.0
-kiwisolver==1.5.1
-matplotlib==3.11.2
-mysql-connector-python==26.10.0
-numpy==2.5.4
-packaging==26.3
-pillow==13.0.0
-PyMySQL==1.2.3
-pyparsing==3.3.3
-python-dateutil==3.0.0
-six==1.17.0
-tk==0.1.0
-tzdata==2026.6
+# Use the repository-wide dependency list for both UIs.
+-r ../requirements.txt

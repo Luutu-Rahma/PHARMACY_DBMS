@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
-import mysql.connector
+import psycopg
 from matplotlib.figure import Figure
 from matplotlib.ticker import FuncFormatter
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -32,8 +32,8 @@ def empty_chart(fig, message):
 
 # ---------- report loaders: draw on fig, return insight text (or (text, table rows)) ----------
 def sales_over_time(fig):
-    rows = q("SELECT DATE(`TimeStamp`), COUNT(*), SUM(TotalAmount) FROM TRANSACTIONS "
-             "GROUP BY DATE(`TimeStamp`) ORDER BY 1")
+    rows = q("SELECT DATE(timestamp), COUNT(*), SUM(TotalAmount) FROM TRANSACTIONS "
+             "GROUP BY DATE(timestamp) ORDER BY 1")
     if not rows:
         empty_chart(fig, "No sales recorded yet")
         return "No sales recorded yet."
@@ -79,7 +79,7 @@ def payment_methods(fig):
 
 def stock_per_drug(fig):
     rows = q("SELECT d.GenericName, "
-             "COALESCE(SUM(CASE WHEN b.ExpiryDate > CURDATE() THEN b.QuantityLeft ELSE 0 END), 0) AS stock "
+             "COALESCE(SUM(CASE WHEN b.ExpiryDate > CURRENT_DATE THEN b.QuantityLeft ELSE 0 END), 0) AS stock "
              "FROM DRUGS d LEFT JOIN INVENTORY_BATCHES b ON b.DrugID = d.DrugID "
              "GROUP BY d.DrugID, d.GenericName ORDER BY stock ASC")
     if not rows:
@@ -119,9 +119,9 @@ def top_sellers(fig):
 
 def expiry_watch(fig):
     rows = q("SELECT d.GenericName, b.BatchNumber, b.QuantityLeft, b.ExpiryDate, "
-             "DATEDIFF(b.ExpiryDate, CURDATE()) AS days, b.QuantityLeft * b.UnitPrice AS value "
+             "(b.ExpiryDate - CURRENT_DATE) AS days, b.QuantityLeft * b.UnitPrice AS value "
              "FROM INVENTORY_BATCHES b JOIN DRUGS d ON d.DrugID = b.DrugID "
-             f"WHERE b.QuantityLeft > 0 AND b.ExpiryDate <= CURDATE() + INTERVAL {SOON_DAYS} DAY "
+             f"WHERE b.QuantityLeft > 0 AND b.ExpiryDate <= CURRENT_DATE + INTERVAL '{SOON_DAYS} days' "
              "ORDER BY b.ExpiryDate")
     if not rows:
         empty_chart(fig, "No expired or expiring batches")
@@ -175,7 +175,7 @@ class ChartTab(ttk.Frame):
         self.fig.clear()
         try:
             result = self.loader(self.fig)
-        except mysql.connector.Error as e:
+        except psycopg.Error as e:
             messagebox.showerror("Database error", str(e), parent=self)
             return
         text, rows = result if isinstance(result, tuple) else (result, None)

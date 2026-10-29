@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Drug catalogue{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">REFERENCE</p><h1>Drug catalogue</h1><p class="muted">Browse medicines and sellable stock. Expired batches are excluded.</p></div></div>
+<div class="panel"><form method="get" action="/catalogue" class="search-form"><label for="q">Search catalogue</label><input id="q" name="q" value="{{ search }}" placeholder="Name, brand or category"><button class="button primary">Search</button><a class="button secondary" href="/catalogue">Clear</a></form></div>
+<div class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>Generic name</th><th>Brand</th><th>Category</th><th>Unit</th><th>Price (UGX)</th><th>Sellable stock</th></tr></thead><tbody>
+{% for row in rows %}<tr><td><strong>{{ row.genericname }}</strong></td><td>{{ row.brandname or '—' }}</td><td>{{ row.categoryname }}</td><td>{{ row.unitmeasure }}</td><td>{{ '{:,.0f}'.format(row.unitprice) }}</td><td>{% if row.sellable_stock == 0 %}<span class="status danger">Out of stock · 0</span>{% elif row.sellable_stock < 50 %}<span class="status warning">Low · {{ row.sellable_stock }}</span>{% else %}<span class="status good">{{ row.sellable_stock }}</span>{% endif %}</td></tr>{% else %}<tr><td colspan="6" class="empty-table">No matching medicines found.</td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

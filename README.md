@@ -1,5 +1,5 @@
 # PharmaFlow - Pharmacy Inventory and Sales Management System (DBMS)
-**Group 16** | MySQL / MariaDB (XAMPP) | VS Code
+**Group 16** | Tkinter desktop + FastAPI web app | MySQL/MariaDB legacy scripts + Supabase PostgreSQL
 
 | Name | Reg. No. |
 |---|---|
@@ -23,20 +23,25 @@ sql/
   04_queries_reports.sql      reports for each project objective
   05_roles_privileges.sql     one MySQL account per role
   06_tests.sql                statements that are SUPPOSED to fail
+   postgres/                   PostgreSQL schema, triggers, demo seed, grants
+web/                          FastAPI/Jinja2 application
+app/                          Tkinter desktop application
 docs/                         requirements, abstract, data dictionary, ERD
 setup.bat                     one-click rebuild for XAMPP on Windows
 ```
 
 ## Quick start
-1. Start **MySQL** in the XAMPP Control Panel.
-2. Run `setup.bat` (or run the files in order 00, 01, 02, 03, 05 with
-   `C:\xampp\mysql\bin\mysql.exe -u root < sql\<file>.sql`).
-3. In VS Code copy `.vscode/settings.example.json` to `.vscode/settings.json`
-   (this file is git-ignored), then connect with SQLTools.
-4. Open `sql/04_queries_reports.sql` and run the queries.
+The current Python apps use Supabase PostgreSQL. Follow [docs/FASTAPI_SUPABASE_SETUP.md](docs/FASTAPI_SUPABASE_SETUP.md) for installing dependencies, configuring `.env`, initializing the PostgreSQL schema, optionally loading demo data, and launching either UI. The older `setup.bat` and SQL scripts at the root of `sql/` are retained for the legacy MySQL/MariaDB project only; they do not initialize Supabase.
 
 ## Desktop application
-The project also includes a Tkinter desktop app for sales, inventory, drug and supplier records, user management, and reports. For first-time setup—including Python packages, database preparation, optional VS Code extensions, and how to launch the app—see [docs/TKINTER_APP_GUIDE.md](docs/TKINTER_APP_GUIDE.md).
+The project includes the Tkinter desktop app and a separate FastAPI web interface with sales, inventory, catalogue management, reports, and user management. The original SQL scripts and XAMPP setup are retained for the legacy MySQL/MariaDB version. The current Python applications are configured for PostgreSQL through `DATABASE_URL`.
+
+- For Supabase PostgreSQL and the FastAPI web application, follow [docs/FASTAPI_SUPABASE_SETUP.md](docs/FASTAPI_SUPABASE_SETUP.md).
+- For future public hosting considerations (not deployed), see [docs/FUTURE_WEB_HOSTING.md](docs/FUTURE_WEB_HOSTING.md).
+- The desktop UI is still launched with `python app/login.py`; it also uses the PostgreSQL configuration.
+- For a detailed functional mapping of the original Tkinter operations to the web application, see [docs/FASTAPI_WEB_APP_PROMPT_BRIEF.md](docs/FASTAPI_WEB_APP_PROMPT_BRIEF.md).
+
+Do not run the legacy MySQL `setup.bat` against real data. The separate `sql/postgres/` setup scripts are opt-in and do not reset the database.
 
 ## Key rules enforced by the database
 - Only 4 valid roles; only `Cash` or `Mobile Money` payments.

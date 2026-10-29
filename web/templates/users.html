@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}User management{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">ACCESS CONTROL</p><h1>User management</h1><p class="muted">Manage staff accounts and the parts of PharmaFlow they can access.</p></div></div>
+<div class="two-column records-layout">
+<section class="panel"><div class="section-heading"><div><h2>{% if record %}Update user{% else %}Add a user{% endif %}</h2><p class="muted">New passwords must be at least 6 characters.</p></div></div>
+<form method="post" action="/users/save" class="form-stack"><input type="hidden" name="csrf_token" value="{{ csrf }}"><input type="hidden" name="record_id" value="{{ record.userid if record else '' }}">
+<label for="fullname">Full name *</label><input id="fullname" name="fullname" required value="{{ record.fullname if record else '' }}">
+<label for="username">Username *</label><input id="username" name="username" required autocomplete="off" value="{{ record.username if record else '' }}">
+<label for="role">Role *</label><select id="role" name="role" required>{% for role in roles %}<option value="{{ role }}" {% if record and record.role == role %}selected{% endif %}>{{ role }}</option>{% endfor %}</select>
+<label for="password">{% if record %}New password (optional){% else %}Password *{% endif %}</label><input id="password" name="password" type="password" minlength="6" autocomplete="new-password" {% if not record %}required{% endif %}>
+<label for="password_confirmation">Confirm password{% if not record %} *{% endif %}</label><input id="password_confirmation" name="password_confirmation" type="password" minlength="6" autocomplete="new-password" {% if not record %}required{% endif %}>
+<div class="button-row"><button class="button primary">{{ 'Save changes' if record else 'Add user' }}</button>{% if record %}<a class="button secondary" href="/users">Cancel</a>{% else %}<button class="button secondary" type="reset">Clear form</button>{% endif %}</div></form></section>
+<section class="panel list-panel"><div class="section-heading"><div><h2>Staff accounts</h2><p class="muted">{{ users|length }} account(s)</p></div><a class="button secondary" href="/users">Refresh</a></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Username</th><th>Role</th><th></th></tr></thead><tbody>{% for row in users %}<tr><td>{{ row.fullname }}</td><td>{{ row.username }}</td><td><span class="role-pill small-pill">{{ row.role }}</span></td><td><a class="table-action" href="/users?edit_id={{ row.userid }}">Edit</a></td></tr>{% else %}<tr><td colspan="4" class="empty-table">No users found.</td></tr>{% endfor %}</tbody></table></div></section>
+</div>
+{% endblock %}

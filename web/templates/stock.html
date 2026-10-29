@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Stock by batch{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">BATCH VISIBILITY</p><h1>Stock by batch</h1><p class="muted">Search stock by medicine, batch number, or supplier.</p></div></div>
+<div class="panel"><form method="get" action="/stock" class="filter-form"><div class="search-field"><label for="q">Search</label><input id="q" name="q" value="{{ search }}" placeholder="Search batches…"></div><label class="check-label"><input type="checkbox" name="hide_expired" value="true" {% if hide_expired %}checked{% endif %}> Hide expired</label><label class="check-label"><input type="checkbox" name="hide_empty" value="true" {% if hide_empty %}checked{% endif %}> Hide empty</label><button class="button primary">Apply filters</button><a class="button secondary" href="/stock">Reset</a></form></div>
+<div class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>Drug</th><th>Batch</th><th>Supplier</th><th>Left</th><th>Expiry</th><th>Status</th></tr></thead><tbody>
+{% for row in rows %}<tr><td><strong>{{ row.genericname }}</strong></td><td>{{ row.batchnumber }}</td><td>{{ row.suppliername }}</td><td>{{ row.quantityleft }}</td><td>{{ row.expirydate }}</td><td>{% set days = (row.expirydate - current_date).days %}{% if days <= 0 %}<span class="status danger">Expired</span>{% elif days <= 90 %}<span class="status warning">Expires in {{ days }} days</span>{% else %}<span class="status good">OK</span>{% endif %}</td></tr>{% else %}<tr><td colspan="6" class="empty-table">No batches match these filters.</td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

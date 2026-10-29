@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Overview{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">YOUR WORKSPACE</p><h1>Good to see you, {{ user.fullname.split()[0] }}</h1><p class="muted">A clear view of today's pharmacy activity.</p></div><span class="role-pill">{{ user.role }}</span></div>
+<div class="stat-grid">
+  <article class="stat-card"><span class="stat-icon teal">✚</span><p>Drug catalogue</p><strong>{{ stats.drug_count }}</strong><small>registered medicines</small></article>
+  <article class="stat-card"><span class="stat-icon green">▦</span><p>Available batches</p><strong>{{ stats.active_batches }}</strong><small>unexpired batches in stock</small></article>
+  {% if user.role in ['Admin', 'InventoryManager', 'Pharmacist'] %}<article class="stat-card"><span class="stat-icon blue">↗</span><p>Sales today</p><strong>{{ stats.sales_today }}</strong><small>completed transactions</small></article><article class="stat-card"><span class="stat-icon amber">UGX</span><p>Revenue today</p><strong>{{ '{:,.0f}'.format(stats.revenue_today) }}</strong><small>total sales value</small></article>{% endif %}
+</div>
+<div class="section-heading"><div><h2>Quick access</h2><p class="muted">Choose a task to get started.</p></div></div>
+<div class="action-grid">
+{% if user.role in ['Admin', 'Cashier'] %}<a class="action-card" href="/sales"><span>＋</span><strong>Start a sale</strong><small>Ring up a customer purchase</small></a>{% endif %}
+{% if user.role in ['Admin', 'InventoryManager'] %}<a class="action-card" href="/inventory"><span>▤</span><strong>Receive stock</strong><small>Record an incoming batch</small></a><a class="action-card" href="/records/drugs"><span>✚</span><strong>Manage catalogue</strong><small>Drugs, suppliers and categories</small></a>{% endif %}
+{% if user.role == 'Pharmacist' %}<a class="action-card" href="/catalogue"><span>✚</span><strong>Browse medicines</strong><small>Search the drug catalogue</small></a><a class="action-card" href="/stock"><span>▦</span><strong>Check stock</strong><small>Review batches and expiry status</small></a>{% endif %}
+{% if user.role in ['Admin', 'InventoryManager', 'Pharmacist'] %}<a class="action-card" href="/reports"><span>▥</span><strong>View reports</strong><small>Sales, stock and expiry insights</small></a>{% endif %}
+{% if user.role == 'Admin' %}<a class="action-card" href="/users"><span>♙</span><strong>Manage users</strong><small>Accounts and access roles</small></a>{% endif %}
+</div>
+<div class="note-card"><span class="note-mark">i</span><p><strong>Stock safety is built in.</strong> Expired batches and quantities above available stock cannot be sold.</p></div>
+{% endblock %}

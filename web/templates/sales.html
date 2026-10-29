@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Sales{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">CHECKOUT</p><h1>New sale</h1><p class="muted">Choose available batches, build a basket, and complete payment.</p></div><span class="role-pill">Served by {{ user.fullname }}</span></div>
+<div class="two-column">
+  <section class="panel"><div class="section-heading"><div><h2>Add items</h2><p class="muted">Only in-stock, unexpired batches are shown.</p></div></div>
+    {% if batches %}<form method="post" action="/sales/cart/add" class="form-grid">
+      <input type="hidden" name="csrf_token" value="{{ csrf }}">
+      <label class="wide" for="batchid">Drug and batch</label><select class="wide" name="batchid" id="batchid" required><option value="">Select a batch…</option>{% for b in batches %}<option value="{{ b.batchid }}">{{ b.genericname }}{% if b.brandname %} · {{ b.brandname }}{% endif %} — {{ b.batchnumber }} · {{ b.quantityleft }} left · expires {{ b.expirydate }} · UGX {{ '{:,.0f}'.format(b.unitprice) }}</option>{% endfor %}</select>
+      <label for="quantity">Quantity</label><input id="quantity" name="quantity" type="number" min="1" value="1" required>
+      <div class="wide"><button class="button primary" type="submit">Add to basket</button></div>
+    </form>{% else %}<div class="empty-state">No sellable batches are currently available.</div>{% endif %}
+  </section>
+  <section class="panel basket-panel"><div class="section-heading"><div><h2>Basket <span class="count-badge">{{ basket|length }}</span></h2><p class="muted">Prices are rechecked when you complete the sale.</p></div></div>
+    {% if basket %}<div class="table-wrap"><table><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th><th></th></tr></thead><tbody>
+      {% for item in basket %}<tr><td><strong>{{ item.genericname }}</strong><small class="table-sub">{{ item.batchnumber }} · expiry {{ item.expirydate }}</small></td><td>{{ item.cart_quantity }}</td><td>{{ '{:,.0f}'.format(item.unitprice) }}</td><td>{{ '{:,.0f}'.format(item.unitprice * item.cart_quantity) }}</td><td><form method="post" action="/sales/cart/remove"><input type="hidden" name="csrf_token" value="{{ csrf }}"><input type="hidden" name="batchid" value="{{ item.batchid }}"><button class="icon-button" aria-label="Remove {{ item.genericname }}" title="Remove">×</button></form></td></tr>{% endfor %}
+    </tbody></table></div>
+    <div class="basket-total"><span>Total</span><strong>UGX {{ '{:,.0f}'.format(total) }}</strong></div>
+    <form method="post" action="/sales/complete" class="checkout-form"><input type="hidden" name="csrf_token" value="{{ csrf }}"><label for="paymentmethod">Payment method</label><select id="paymentmethod" name="paymentmethod"><option>Cash</option><option>Mobile Money</option></select><button class="button primary" type="submit">Complete sale</button></form>
+    <form method="post" action="/sales/cart/clear" class="clear-form"><input type="hidden" name="csrf_token" value="{{ csrf }}"><button class="button text-button" type="submit">Clear basket</button></form>
+    {% else %}<div class="empty-state">Your basket is empty.<span>Add an item to begin checkout.</span></div>{% endif %}
+  </section>
+</div>
+{% endblock %}

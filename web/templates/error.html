@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}Request could not continue{% endblock %}
+{% block content %}<div class="page-heading"><div><p class="eyebrow">PHARMAFLOW</p><h1>Request could not continue</h1></div></div><div class="panel"><div class="flash error" role="alert">{{ error }}</div><a class="button secondary" href="/">Return to overview</a></div>{% endblock %}
+{% block auth_content %}
+<div class="login-card"><a class="brand login-brand" href="/login">✚ <span>PharmaFlow</span></a><h1>Request could not continue</h1><div class="flash error">{{ error }}</div><a class="button primary full" href="/login">Go to sign in</a></div>
+{% endblock %}
