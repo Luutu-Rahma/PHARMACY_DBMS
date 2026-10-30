@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block auth_content %}
+<section class="login-card">
+  <div class="eyebrow">WELCOME BACK</div>
+  <h1>Sign in to PharmaFlow</h1>
+  <p class="muted">Use your pharmacy staff account to continue.</p>
+  {% if error %}<div class="alert alert-error" role="alert">{{ error }}</div>{% endif %}
+  <form method="post" action="/login" class="stack-form">
+    <input type="hidden" name="_csrf" value="{{ csrf }}">
+    <label for="username">Username</label>
+    <input id="username" name="username" autocomplete="username" required maxlength="50" autofocus>
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+    <button class="button button-primary button-wide" type="submit">Sign in <span aria-hidden="true">→</span></button>
+  </form>
+  <div class="login-note"><span class="lock-icon">◉</span> Your password is verified by the pharmacy database.</div>
+</section>
+{% endblock %}

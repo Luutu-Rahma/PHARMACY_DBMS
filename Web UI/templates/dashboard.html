@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading">
+  <div><div class="eyebrow">YOUR WORKSPACE</div><h1>Good day, {{ user.name.split(' ')[0] }}</h1><p class="muted">A clear view of today's pharmacy operations.</p></div>
+  <span class="role-pill">{{ user.role }}</span>
+</section>
+{% if cards %}<section class="metric-grid" aria-label="Current pharmacy summary">
+  {% for card in cards %}<article class="metric-card {% if card.warning %}metric-warning{% endif %}"><div class="metric-label">{{ card.label }}</div><div class="metric-value">{{ card.value }}</div>{% if card.warning %}<div class="metric-foot warning-text">Needs attention</div>{% endif %}</article>{% endfor %}
+</section>{% endif %}
+<section class="section-heading"><div><h2>Quick access</h2><p class="muted">Choose an area available to your role.</p></div></section>
+<div class="quick-grid">
+  {% for label, href in menu %}<a class="quick-card" href="{{ href }}"><span class="quick-icon">{% if 'Sale' in label %}↗{% elif 'Inventory' in label or 'Stock' in label %}▦{% elif 'Drug' in label %}◈{% elif 'Report' in label %}▤{% else %}♙{% endif %}</span><span><strong>{{ label }}</strong><small>Open {{ label|lower }} workspace</small></span><span class="arrow">→</span></a>{% endfor %}
+</div>
+<div class="info-panel"><div class="info-symbol">✦</div><div><strong>Stock-aware pharmacy operations</strong><p>Sellable stock excludes expired batches. Inventory expiry alerts use a 90-day window, and completed sales use the existing MySQL triggers.</p></div></div>
+{% endblock %}

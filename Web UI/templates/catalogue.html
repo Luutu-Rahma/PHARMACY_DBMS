@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading"><div><div class="eyebrow">CATALOGUE MANAGEMENT</div><h1>{{ spec.heading }}</h1><p class="muted">Create and update records used across inventory and sales.</p></div></section>
+<div class="tab-links" role="tablist" aria-label="Catalogue sections"><a class="tab-link {% if entity == 'drugs' %}selected{% endif %}" href="/catalogue/drugs">Drugs</a><a class="tab-link {% if entity == 'suppliers' %}selected{% endif %}" href="/catalogue/suppliers">Suppliers</a><a class="tab-link {% if entity == 'categories' %}selected{% endif %}" href="/catalogue/categories">Categories</a></div>
+<section class="panel form-panel"><div class="panel-heading"><div><h2>{% if selected %}Update {{ spec.heading[:-1]|lower }}{% else %}Add {{ spec.heading[:-1]|lower }}{% endif %}</h2><p class="muted">Select a row below to edit it. Existing records are not deleted.</p></div>{% if selected %}<a class="button button-quiet" href="/catalogue/{{ entity }}">New / clear</a>{% endif %}</div>
+<form action="/catalogue/{{ entity }}/save" method="post" class="form-grid">
+  <input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="record_id" value="{{ selected[spec.pk] if selected else '' }}">
+  {% for field in spec.fields %}{% set key = field[0] %}{% set label = field[1] %}{% set kind = field[2] %}<div><label for="{{ key }}">{{ label }}{% if field[4] %} *{% endif %}</label>
+    {% if kind == 'category' %}<select id="{{ key }}" name="{{ key }}" required><option value="">Choose category</option>{% for category in categories %}<option value="{{ category.CategoryID }}" {% if edit_values and edit_values[key]|string == category.CategoryID|string %}selected{% endif %}>{{ category.CategoryName }}</option>{% endfor %}</select>
+    {% elif kind == 'unit' %}<select id="{{ key }}" name="{{ key }}" required><option value="">Choose unit</option>{% for unit in units %}<option {% if edit_values and edit_values[key] == unit %}selected{% endif %}>{{ unit }}</option>{% endfor %}</select>
+    {% elif kind == 'price' %}<input id="{{ key }}" name="{{ key }}" type="number" min="0.01" step="0.01" value="{{ edit_values[key] if edit_values else '' }}" required>
+    {% elif key == 'description' or key == 'address' %}<textarea id="{{ key }}" name="{{ key }}" maxlength="{{ field[3] }}" {% if field[4] %}required{% endif %}>{{ edit_values[key] if edit_values else '' }}</textarea>
+    {% else %}<input id="{{ key }}" name="{{ key }}" {% if kind == 'email' %}type="email"{% else %}type="text"{% endif %} maxlength="{{ field[3] }}" value="{{ edit_values[key] if edit_values else '' }}" {% if field[4] %}required{% endif %}>{% endif %}
+  </div>{% endfor %}
+  <div class="form-submit"><button class="button button-primary" type="submit">{% if selected %}Save changes{% else %}Add record{% endif %} →</button></div>
+</form></section>
+<section class="section-heading"><div><h2>{{ spec.heading }} list</h2><p class="muted">{{ rows|length }} record(s)</p></div><a class="button button-quiet" href="/catalogue/{{ entity }}">Refresh ↻</a></section>
+<section class="panel table-panel">{% if rows %}<div class="table-scroll"><table><thead><tr>{% for heading in spec.columns %}<th>{{ heading }}</th>{% endfor %}<th>Action</th></tr></thead><tbody>
+{% for row in rows %}<tr>{% for value in row.values() %}<td>{{ value if value is not none else '—' }}</td>{% endfor %}<td><a class="small-link" href="/catalogue/{{ entity }}?edit_id={{ row[spec.pk] }}">Edit</a></td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="empty-state">No {{ spec.heading|lower }} found.</div>{% endif %}</section>
+{% endblock %}

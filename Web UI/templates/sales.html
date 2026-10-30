@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading"><div><div class="eyebrow">CHECKOUT</div><h1>New sale</h1><p class="muted">Served by {{ user.name }} · Eligible stock is shown with earliest expiry first.</p></div></section>
+{% if not page_error %}
+<div class="two-column sales-layout">
+  <section class="panel"><div class="panel-heading"><div><h2>Add items</h2><p class="muted">Only in-stock, unexpired batches are available.</p></div><span class="step-badge">01</span></div>
+    {% if batches %}<form action="/sales/basket/add" method="post" class="stack-form">
+      <input type="hidden" name="_csrf" value="{{ csrf }}">
+      <label for="batch_id">Drug and batch</label><select id="batch_id" name="batch_id" required><option value="">Choose a batch…</option>{% for batch in batches %}<option value="{{ batch.BatchID }}">{{ batch.GenericName }}{% if batch.BrandName %} · {{ batch.BrandName }}{% endif %} — {{ batch.BatchNumber }} · {{ batch.QuantityLeft }} left · expires {{ batch.ExpiryDate|datefmt }} · UGX {{ batch.UnitPrice|money }}</option>{% endfor %}</select>
+      <div class="form-row"><div><label for="quantity">Quantity</label><input id="quantity" type="number" name="quantity" min="1" max="999999999" value="1" required></div><button class="button button-secondary align-end" type="submit">Add to basket <span>＋</span></button></div>
+    </form>{% else %}<div class="empty-state">No sellable batches are currently available.</div>{% endif %}
+  </section>
+  <section class="panel"><div class="panel-heading"><div><h2>Basket</h2><p class="muted">Same-batch lines combine automatically.</p></div><span class="step-badge">02</span></div>
+    {% if basket %}<div class="table-scroll"><table><thead><tr><th>Drug / batch</th><th>Qty</th><th>Unit price</th><th>Subtotal</th><th></th></tr></thead><tbody>
+      {% for batch in basket %}<tr><td><strong>{{ batch.GenericName }}</strong><small class="table-sub">{{ batch.BatchNumber }}</small></td><td>{{ quantities[batch.BatchID] }}</td><td>UGX {{ batch.UnitPrice|money }}</td><td>UGX {{ (batch.UnitPrice * quantities[batch.BatchID])|money }}</td><td><form method="post" action="/sales/basket/remove"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="batch_id" value="{{ batch.BatchID }}"><button class="icon-button danger-text" aria-label="Remove {{ batch.GenericName }}" title="Remove line">×</button></form></td></tr>{% endfor %}
+    </tbody></table></div>
+    <div class="basket-total"><span>Total due</span><strong>UGX {{ total|money }}</strong></div>
+    <div class="basket-actions"><form action="/sales/basket/clear" method="post"><input type="hidden" name="_csrf" value="{{ csrf }}"><button class="button button-quiet" type="submit">Clear basket</button></form>
+      <form action="/sales/complete" method="post" class="complete-form"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="sale_nonce_value" value="{{ sale_nonce }}"><label class="sr-only" for="payment_method">Payment method</label><select name="payment_method" id="payment_method">{% for method in payment_methods %}<option>{{ method }}</option>{% endfor %}</select><button class="button button-primary" type="submit" data-confirm="Complete this sale? Stock will be deducted.">Complete sale →</button></form></div>
+    {% else %}<div class="empty-state"><span class="empty-icon">▱</span><strong>Your basket is empty</strong><p>Add a sellable batch to begin checkout.</p></div>{% endif %}
+  </section>
+</div>
+{% endif %}
+<div class="info-panel compact"><div class="info-symbol">✓</div><div><strong>Stock-safe checkout</strong><p>Prices, totals, expiry, stock levels, and the staff identity are verified server-side. MySQL trigger logic records line subtotals and deducts stock once.</p></div></div>
+{% endblock %}

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>{{ page_title|default('PharmaFlow') }} · PharmaFlow</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+  <script defer src="{{ url_for('static', path='/js/app.js') }}"></script>
+</head>
+<body>
+{% if user %}
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="/dashboard"><span class="brand-mark">✚</span><span>Pharma<span class="brand-light">Flow</span><small>PHARMACY SYSTEM</small></span></a>
+    <div class="nav-label">WORKSPACE</div>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="/dashboard" class="nav-link {% if request.url.path == '/dashboard' %}active{% endif %}"><span class="nav-icon">⌂</span>Overview</a>
+      {% for label, href in menu %}
+      <a href="{{ href }}" class="nav-link {% if request.url.path == href or request.url.path.startswith(href ~ '/') %}active{% endif %}"><span class="nav-icon">{% if 'Sale' in label %}↗{% elif 'Inventory' in label or 'Stock' in label %}▦{% elif 'Drug' in label or 'Catalogue' in label %}◈{% elif 'Report' in label %}▤{% elif 'User' in label %}♙{% else %}◷{% endif %}</span>{{ label }}</a>
+      {% endfor %}
+    </nav>
+    <div class="sidebar-bottom"><span class="status-dot"></span> Secure workspace</div>
+  </aside>
+  <main class="main-area">
+    <header class="topbar">
+      <button class="mobile-menu" type="button" aria-label="Toggle navigation" data-menu-toggle>☰</button>
+      <div class="topbar-label">Pharmacy operations <span class="crumb-sep">/</span> <span>{{ page_title|default('Overview') }}</span></div>
+      <div class="user-menu"><div class="avatar">{{ user.name[:1]|upper }}</div><div class="user-meta"><strong>{{ user.name }}</strong><span>{{ user.role }}</span></div><form action="/logout" method="post"><input type="hidden" name="_csrf" value="{{ csrf }}"><button class="text-button" type="submit">Log out</button></form></div>
+    </header>
+    <div class="content-wrap">
+      {% for message in messages %}<div class="alert alert-{{ message.kind }}" role="status">{{ message.text }}</div>{% endfor %}
+      {% if page_error|default('') %}<div class="alert alert-error" role="alert">{{ page_error }}</div>{% endif %}
+      {% block content %}{% endblock %}
+      <footer class="page-footer">PharmaFlow · Aiven MySQL · Inventory and sales workspace</footer>
+    </div>
+  </main>
+</div>
+{% else %}
+<div class="auth-shell">
+  <a class="brand auth-brand" href="/login"><span class="brand-mark">✚</span><span>Pharma<span class="brand-light">Flow</span><small>PHARMACY SYSTEM</small></span></a>
+  {% for message in messages %}<div class="alert alert-{{ message.kind }}">{{ message.text }}</div>{% endfor %}
+  {% block auth_content %}{% endblock %}
+  <p class="auth-foot">Protected pharmacy operations · Encrypted database connection</p>
+</div>
+{% endif %}
+</body>
+</html>

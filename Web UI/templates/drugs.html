@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading"><div><div class="eyebrow">READ-ONLY CATALOGUE</div><h1>Drug catalogue</h1><p class="muted">Browse product details and sellable stock. Expired batches are excluded.</p></div></section>
+<section class="panel table-panel"><form class="filter-bar" method="get" action="/drugs"><label for="q">Search catalogue</label><input id="q" name="q" value="{{ q }}" placeholder="Generic name, brand, or category"><button class="button button-secondary" type="submit">Search</button>{% if q %}<a class="small-link" href="/drugs">Clear</a>{% endif %}</form>
+{% if drugs %}<div class="table-scroll"><table><thead><tr><th>Generic name</th><th>Brand</th><th>Category</th><th>Unit</th><th>Price (UGX)</th><th>Sellable stock</th><th>Status</th></tr></thead><tbody>
+{% for drug in drugs %}<tr class="{% if drug.SellableStock == 0 %}row-expired{% elif drug.SellableStock < low_stock %}row-soon{% endif %}"><td><strong>{{ drug.GenericName }}</strong></td><td>{{ drug.BrandName or '—' }}</td><td>{{ drug.CategoryName }}</td><td>{{ drug.UnitMeasure }}</td><td>UGX {{ drug.UnitPrice|money }}</td><td>{{ drug.SellableStock }}</td><td>{% if drug.SellableStock == 0 %}<span class="status status-danger">Out of stock</span>{% elif drug.SellableStock < low_stock %}<span class="status status-warning">Low stock</span>{% else %}<span class="status status-good">Available</span>{% endif %}</td></tr>{% endfor %}
+</tbody></table></div>{% elif not page_error %}<div class="empty-state">No matching drugs found.</div>{% endif %}</section>
+<div class="legend-row"><span><i class="legend-dot dot-red"></i> Out of stock</span><span><i class="legend-dot dot-orange"></i> Below {{ low_stock }} sellable units</span></div>
+{% endblock %}

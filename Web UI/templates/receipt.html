@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading receipt-heading"><div><div class="eyebrow">SALE CONFIRMED</div><h1>Receipt #{{ receipt.TransactionID }}</h1><p class="muted">A copy of this sale confirmation is available in the current session.</p></div><a class="button button-primary" href="/sales">New sale →</a></section>
+<section class="panel receipt-card"><div class="receipt-meta"><div><span>Served by</span><strong>{{ receipt.FullName }}</strong></div><div><span>Payment method</span><strong>{{ receipt.PaymentMethod }}</strong></div><div><span>Date & time</span><strong>{{ receipt.TimeStamp }}</strong></div></div>
+<div class="table-scroll"><table><thead><tr><th>Drug</th><th>Batch</th><th>Qty</th><th>Unit price</th><th>Subtotal</th></tr></thead><tbody>{% for line in lines %}<tr><td>{{ line.GenericName }}</td><td>{{ line.BatchNumber }}</td><td>{{ line.QuantitySold }}</td><td>UGX {{ line.UnitPrice|money }}</td><td>UGX {{ line.SubTotal|money }}</td></tr>{% endfor %}</tbody></table></div>
+<div class="basket-total receipt-total"><span>Total paid</span><strong>UGX {{ receipt.TotalAmount|money }}</strong></div>
+</section>
+{% endblock %}
