@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading"><div><div class="eyebrow">SUPPLY & EXPIRY TRACKING</div><h1>Inventory</h1><p class="muted">Receive batches and monitor stock by expiry date.</p></div></section>
+<section class="panel form-panel"><div class="panel-heading"><div><h2>Receive a batch</h2><p class="muted">Fields marked * are required. Batch number must be unique for its drug.</p></div></div>
+  {% if drugs and suppliers %}<form action="/inventory/receive" method="post" class="form-grid">
+    <input type="hidden" name="_csrf" value="{{ csrf }}">
+    <div><label for="drug_id">Drug *</label><select name="drug_id" id="drug_id" required><option value="">Select drug</option>{% for drug in drugs %}<option value="{{ drug.DrugID }}">{{ drug.GenericName }}{% if drug.BrandName %} · {{ drug.BrandName }}{% endif %}</option>{% endfor %}</select></div>
+    <div><label for="supplier_id">Supplier *</label><select name="supplier_id" id="supplier_id" required><option value="">Select supplier</option>{% for supplier in suppliers %}<option value="{{ supplier.SupplierID }}">{{ supplier.SupplierName }}</option>{% endfor %}</select></div>
+    <div><label for="batch_number">Batch number *</label><input id="batch_number" name="batch_number" maxlength="50" required></div>
+    <div><label for="quantity">Quantity received *</label><input id="quantity" name="quantity" type="number" min="1" required></div>
+    <div><label for="mfd">Manufacture date *</label><input id="mfd" name="mfd" type="date" required></div>
+    <div><label for="expiry_date">Expiry date *</label><input id="expiry_date" name="expiry_date" type="date" required></div>
+    <div><label for="unit_price">Unit price (UGX) *</label><input id="unit_price" name="unit_price" type="number" min="0.01" step="0.01" required></div>
+    <div class="form-submit"><button class="button button-primary" type="submit">Save batch →</button></div>
+  </form>{% elif not page_error %}<div class="alert alert-warning">Add at least one drug and supplier before receiving stock.</div>{% endif %}
+</section>
+<section class="section-heading"><div><h2>All batches</h2><p class="muted">Red indicates expired. Orange indicates expiry within {{ 90 }} days.</p></div><a class="button button-quiet" href="/inventory">Refresh list ↻</a></section>
+<section class="panel table-panel">{% if batches %}<div class="table-scroll"><table><thead><tr><th>Drug</th><th>Batch</th><th>Supplier</th><th>Received</th><th>Left</th><th>MFD</th><th>Expiry</th><th>Unit price</th><th>Status</th></tr></thead><tbody>
+{% for batch in batches %}<tr class="{% if batch.DaysLeft <= 0 %}row-expired{% elif batch.DaysLeft <= 90 %}row-soon{% endif %}"><td><strong>{{ batch.GenericName }}</strong></td><td>{{ batch.BatchNumber }}</td><td>{{ batch.SupplierName }}</td><td>{{ batch.QuantityReceived }}</td><td>{{ batch.QuantityLeft }}</td><td>{{ batch.MFD|datefmt }}</td><td>{{ batch.ExpiryDate|datefmt }}</td><td>UGX {{ batch.UnitPrice|money }}</td><td>{% if batch.DaysLeft <= 0 %}<span class="status status-danger">Expired</span>{% elif batch.DaysLeft <= 90 %}<span class="status status-warning">{{ batch.DaysLeft }} days</span>{% else %}<span class="status status-good">OK</span>{% endif %}</td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="empty-state">No inventory batches found.</div>{% endif %}</section>
+{% endblock %}

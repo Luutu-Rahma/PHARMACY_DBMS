@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading"><div><div class="eyebrow">READ-ONLY STOCK VIEW</div><h1>Stock by batch</h1><p class="muted">Search batches and review their expiry and remaining quantity.</p></div></section>
+<section class="panel table-panel"><form class="filter-bar filter-wrap" method="get" action="/stock"><label for="q">Search</label><input id="q" name="q" value="{{ q }}" placeholder="Drug, batch, or supplier"><label class="check-label"><input type="checkbox" name="hide_expired" value="true" {% if hide_expired %}checked{% endif %}> Hide expired</label><label class="check-label"><input type="checkbox" name="hide_empty" value="true" {% if hide_empty %}checked{% endif %}> Hide empty</label><button class="button button-secondary" type="submit">Apply</button><a class="small-link" href="/stock">Reset</a></form>
+{% if batches %}<div class="table-scroll"><table><thead><tr><th>Drug</th><th>Batch</th><th>Supplier</th><th>Left</th><th>Expiry</th><th>Status</th></tr></thead><tbody>
+{% for batch in batches %}<tr class="{% if batch.DaysLeft <= 0 %}row-expired{% elif batch.DaysLeft <= soon_days %}row-soon{% endif %}"><td><strong>{{ batch.GenericName }}</strong></td><td>{{ batch.BatchNumber }}</td><td>{{ batch.SupplierName }}</td><td>{{ batch.QuantityLeft }}</td><td>{{ batch.ExpiryDate|datefmt }}</td><td>{% if batch.DaysLeft <= 0 %}<span class="status status-danger">Expired</span>{% elif batch.DaysLeft <= soon_days %}<span class="status status-warning">Expires in {{ batch.DaysLeft }}d</span>{% else %}<span class="status status-good">OK</span>{% endif %}</td></tr>{% endfor %}
+</tbody></table></div>{% elif not page_error %}<div class="empty-state">No batches match these filters.</div>{% endif %}</section>
+<div class="legend-row"><span><i class="legend-dot dot-red"></i> Expired batch</span><span><i class="legend-dot dot-orange"></i> Expiring within {{ soon_days }} days</span></div>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="error-card"><div class="error-code">{{ status_code }}</div><h1>{% if status_code == 403 %}Access restricted{% elif status_code == 404 %}Page not found{% else %}Request could not be completed{% endif %}</h1><p class="muted">{{ message }}</p><a class="button button-primary" href="/">Return to your workspace</a></section>
+{% endblock %}
+{% block auth_content %}
+<section class="error-card auth-error"><div class="error-code">{{ status_code }}</div><h1>{% if status_code == 403 %}Access restricted{% elif status_code == 404 %}Page not found{% else %}Request could not be completed{% endif %}</h1><p class="muted">{{ message }}</p><a class="button button-primary" href="/login">Return to sign in</a></section>
+{% endblock %}

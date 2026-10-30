@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading"><div><div class="eyebrow">ACCESS CONTROL</div><h1>User management</h1><p class="muted">Add staff or update existing account details and roles.</p></div></section>
+<section class="panel form-panel"><div class="panel-heading"><div><h2>{% if selected %}Update user{% else %}Add a user{% endif %}</h2><p class="muted">Passwords are stored as SHA-256 digests, matching the desktop application.</p></div>{% if selected %}<a class="button button-quiet" href="/users">New / clear</a>{% endif %}</div>
+<form action="/users/save" method="post" class="form-grid">
+  <input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="user_id" value="{{ selected.UserID if selected else '' }}">
+  <div><label for="full_name">Full name *</label><input id="full_name" name="full_name" maxlength="150" value="{{ selected.FullName if selected else '' }}" required></div>
+  <div><label for="username">Username *</label><input id="username" name="username" maxlength="50" pattern="[A-Za-z0-9_.-]+" value="{{ selected.UserName if selected else '' }}" required></div>
+  <div><label for="role">Role *</label><select id="role" name="role" required><option value="">Choose role</option>{% for role in roles %}<option {% if selected and selected.Role == role %}selected{% endif %}>{{ role }}</option>{% endfor %}</select></div>
+  <div><label for="password">{% if selected %}New password (optional){% else %}Password *{% endif %}</label><input id="password" name="password" type="password" minlength="6" autocomplete="new-password" {% if not selected %}required{% endif %}></div>
+  <div><label for="confirm_password">Confirm password</label><input id="confirm_password" name="confirm_password" type="password" minlength="6" autocomplete="new-password"></div>
+  <div class="form-submit"><button class="button button-primary" type="submit">{% if selected %}Save user{% else %}Add user{% endif %} →</button></div>
+</form>
+<div class="inline-note">You cannot remove your own Admin role. Leaving both password fields blank on update keeps the existing password.</div>
+</section>
+<section class="section-heading"><div><h2>Staff accounts</h2><p class="muted">{{ users|length }} account(s)</p></div><a class="button button-quiet" href="/users">Refresh ↻</a></section>
+<section class="panel table-panel">{% if users %}<div class="table-scroll"><table><thead><tr><th>Full name</th><th>Username</th><th>Role</th><th>Action</th></tr></thead><tbody>
+{% for staff in users %}<tr><td><strong>{{ staff.FullName }}</strong></td><td>{{ staff.UserName }}</td><td><span class="role-pill small">{{ staff.Role }}</span></td><td><a class="small-link" href="/users?edit_id={{ staff.UserID }}">Edit</a></td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="empty-state">No user accounts found.</div>{% endif %}</section>
+{% endblock %}
