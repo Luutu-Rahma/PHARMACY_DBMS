@@ -6,6 +6,6 @@
 .DS_Store
 Thumbs.db
 __pycache__/
-db.py
+# db.py
 test_connection.py
 .env
